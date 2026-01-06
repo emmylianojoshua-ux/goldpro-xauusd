@@ -1,0 +1,92 @@
+lib/main.dart
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(GoldProApp());
+}
+
+class GoldProApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData.dark(),
+      home: Dashboard(),
+    );
+  }
+}
+
+class Dashboard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("XAUUSD Signals")),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            signalCard("BUY", 2350, 2338, 2380),
+            SizedBox(height: 20),
+            ElevatedButton(
+              child: Text("Risk Calculator"),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => RiskCalculator()),
+                );
+              },
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget signalCard(String type, double entry, double sl, double tp) {
+    return Card(
+      child: ListTile(
+        title: Text("$type XAUUSD", style: TextStyle(fontSize: 20)),
+        subtitle: Text("Entry: $entry\nSL: $sl\nTP: $tp"),
+      ),
+    );
+  }
+}
+
+class RiskCalculator extends StatelessWidget {
+  final balance = TextEditingController();
+  final risk = TextEditingController();
+  final sl = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Risk Calculator")),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            TextField(controller: balance, decoration: InputDecoration(labelText: "Balance")),
+            TextField(controller: risk, decoration: InputDecoration(labelText: "Risk %")),
+            TextField(controller: sl, decoration: InputDecoration(labelText: "SL ($)")),
+            SizedBox(height: 20),
+            ElevatedButton(
+              child: Text("Calculate"),
+              onPressed: () {
+                double lot = (double.parse(balance.text) *
+                        (double.parse(risk.text) / 100)) /
+                    double.parse(sl.text);
+
+                showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    content: Text("Lot Size: ${lot.toStringAsFixed(2)}"),
+                  ),
+                );
+              },
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
